@@ -11,8 +11,10 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+
+
 class App {
-  // private properties: are going to be present on all the instances created through this class
+  // Private properties: are going to be present on all the instances created through this class
   #map;
   #mapEvent;
   constructor() {
@@ -24,7 +26,7 @@ class App {
   _getPosition() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        // using .bind() to point "this" to the current object
+        // Using .bind() to point "this" to the current object
         this._loadMap.bind(this),
         function () {
           alert('could not get position');
@@ -57,10 +59,8 @@ class App {
   }
 
   _toggleEvelationField() {
-    inputElevation
-    .closest('.form__row')
-    .classList.toggle('form__row--hidden');
-  inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+    inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   }
 
   _newWorkout(e) {
@@ -73,9 +73,18 @@ class App {
       inputElevation.value =
         '';
 
+    // Change leaflet's icon appearance    
+    let newIcon = L.icon({
+      iconUrl: 'img/icon.png',
+
+      iconSize: [40, 40], // size of the icon
+      iconAnchor: [22, 80], // point of the icon which will correspond to marker's location
+      popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+    });
+
     const { lat, lng } = this.#mapEvent.latlng;
     // Display marker
-    L.marker([lat, lng])
+    L.marker([lat, lng], { icon: newIcon })
       .addTo(this.#map)
       .bindPopup(
         L.popup({
