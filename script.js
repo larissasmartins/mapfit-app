@@ -1,8 +1,5 @@
 'use strict';
 
-// prettier-ignore
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 class Workout {
   date = new Date();
   id = (Date.now() + '').slice(-10);
@@ -12,14 +9,25 @@ class Workout {
     this.distance = distance; // in km
     this.duration = duration; // in min
   }
+
+  _setDescription() {
+    // prettier-ignore
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
+      months[this.date.getMonth()]
+    } ${this.date.getDate()}`;
+  }
 }
 class Running extends Workout {
   type = 'running';
+
   constructor(coords, distance, duration, cadance) {
     super(coords, distance, duration);
     this.cadance = cadance;
 
     this.calcPace();
+    this._setDescription();
   }
 
   calcPace() {
@@ -37,6 +45,7 @@ class Cycling extends Workout {
     this.elevationGain = elevationGain;
 
     this.calcSpeed();
+    this._setDescription();
   }
 
   calcSpeed() {
@@ -143,14 +152,14 @@ class App {
       )
         return alert('Inputs have to be positive numbers.');
 
-      workout = new Running([lat, lng], distance, duration, elevation);
+      workout = new Cycling([lat, lng], distance, duration, elevation);
     }
 
     // Add new object to workout array
     this.#workouts.push(workout);
 
     // Render workout on map as marker
-    this.renderWorkoutMarker(workout);
+    this._renderWorkoutMarker(workout);
 
     // Render workout on list
 
@@ -162,7 +171,7 @@ class App {
         '';
   }
 
-  renderWorkoutMarker(workout) {
+  _renderWorkoutMarker(workout) {
     // Change leaflet's icon appearance
     let newIcon = L.icon({
       iconUrl: 'img/icon.png',
