@@ -68,11 +68,13 @@ class App {
   #map;
   #mapEvent;
   #workouts = [];
+  #mapZoomLevel = 13;
 
   constructor() {
     this._getPosition();
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleEvelationField);
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -81,7 +83,7 @@ class App {
         // Using .bind() to point "this" to the current object
         this._loadMap.bind(this),
         function () {
-          alert('could not get position');
+          alert('Could not get position');
         }
       );
     }
@@ -93,7 +95,7 @@ class App {
 
     const coords = [latitude, longitude];
 
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
     L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
@@ -252,6 +254,24 @@ class App {
     `;
 
     form.insertAdjacentHTML('afterend', html);
+  }
+
+  _moveToPopup(e) {
+    const workoutElement = e.target.closest('.workout');
+    if (!workoutElement) return;
+
+    const workout = this.#workouts.find(
+      work => work.id === workoutElement.dataset.id
+    );
+    console.log(workout);
+
+    // Leaflet's method to handle zoom
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1
+      }
+    });
   }
 }
 
