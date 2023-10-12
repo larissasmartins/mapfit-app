@@ -10,6 +10,7 @@ class Workout {
     this.duration = duration; // in min
   }
 
+  // Adding a description on the workout marker 
   _setDescription() {
     // prettier-ignore
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -107,7 +108,7 @@ class App {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    // Handling clicks on map
+    // Handling clicks on map: to show the form
     this.#map.on('click', this._showForm.bind(this));
 
     // Render the previous markers on the map when its fully load
@@ -134,7 +135,9 @@ class App {
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   }
 
+  // When filling the form...
   _newWorkout(e) {
+    // Inputs validation
     const validInputs = (...inputs) =>
       inputs.every(input => Number.isFinite(input));
     const allPositive = (...inputs) => inputs.every(input => input > 0);
@@ -218,6 +221,7 @@ class App {
       .openPopup();
   }
 
+  // Workouts list
   _renderWorkout(workout) {
     let html = `
       <li class="workout workout--${workout.type}" data-id="${workout.id}">
@@ -269,6 +273,7 @@ class App {
     form.insertAdjacentHTML('afterend', html);
   }
 
+  // Move map to the workout marker when clicked
   _moveToPopup(e) {
     const workoutElement = e.target.closest('.workout');
     if (!workoutElement) return;
@@ -286,6 +291,7 @@ class App {
     });
   }
 
+  // Saving datas on local storage
   _setLocalStorage() { 
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
@@ -300,6 +306,12 @@ class App {
     this.#workouts.forEach(work => {
       this._renderWorkout(work);
     });
+  }
+
+  // Deleting workouts list
+  reset() {
+    localStorage.removeItem('workouts');
+    location.realod();
   }
 }
 
