@@ -169,44 +169,22 @@ a:visited {
   display: none;
 }
 
-.error-message {
-  display: none; 
-  background: var(--color-dark--2);
-  box-shadow: 1px 7px 16px -5px rgb(0 0 0 / 60%);
-  border-radius: 5px;
-  padding: 1rem;
-  border-left: 5px solid hsla(11,100%,42.2%,1);
-  font-weight: 600;
-  font-size: 14px;
-  width: fit-content;
-  margin: 0 auto 1.75rem;
-
-  animation: slide-up 1.25s forwards;
-  animation-delay: 2.25s;
-  -webkit-animation-delay: 2.25s;
+.copyright {
+  margin-top: auto;
+  font-size: 1.3rem;
+  text-align: center;
+  color: var(--color-light--1);
 }
 
-@keyframes slide-up {
-  from {transition: translateY(0);opacity: 1}
-  to {transition: translateY(-150px);opacity: 0;top:0px;}
+.twitter-link:link,
+.twitter-link:visited {
+  color: var(--color-light--1);
+  transition: all 0.2s;
 }
 
-.error-message__content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-}
-
-.icon {
-  font-size: 20px;
-}
-
-.close {
-  transform: translate(0px,-10px);
-  font-size: 2em;
-  color: #dddddd;
-  cursor: pointer;
+.twitter-link:hover,
+.twitter-link:active {
+  color: var(--color-light--2);
 }
 
 /* MAP */

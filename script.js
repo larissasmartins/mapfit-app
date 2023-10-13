@@ -10,7 +10,7 @@ class Workout {
     this.duration = duration; // in min
   }
 
-  // Adding a description on the workout marker
+  // Adding a description on the workout marker 
   _setDescription() {
     // prettier-ignore
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -64,9 +64,6 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
-const errorMessage = document.querySelector('.error-message');
-const errorMessageClose = document.querySelector('.close');
-
 class App {
   // Private properties: are going to be present on all the instances created through this class
   #map;
@@ -80,14 +77,10 @@ class App {
 
     // Get data from local storage
     this._getDataLocalStorage();
-
+    
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleEvelationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
-    errorMessageClose.addEventListener(
-      'click',
-      this._closeErrorMessage.bind(this)
-    );
   }
 
   _getPosition() {
@@ -165,11 +158,9 @@ class App {
       if (
         !validInputs(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
-      ) {
-        // Display error message notification
-        this._displayErrorMessage();
-        return;
-      }
+      )
+        return alert('Inputs have to be positive numbers.');
+
       workout = new Running([lat, lng], distance, duration, cadence);
     }
 
@@ -180,11 +171,9 @@ class App {
       if (
         !validInputs(distance, duration, elevation) ||
         !allPositive(distance, duration)
-      ) {
-        // Display error message notification
-        this._displayErrorMessage();
-        return;
-      }
+      )
+        return alert('Inputs have to be positive numbers.');
+
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
 
@@ -282,7 +271,6 @@ class App {
     `;
 
     form.insertAdjacentHTML('afterend', html);
-    errorMessage.style.display = 'none';
   }
 
   // Move map to the workout marker when clicked
@@ -304,31 +292,20 @@ class App {
   }
 
   // Saving datas on local storage
-  _setLocalStorage() {
+  _setLocalStorage() { 
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
 
-  _getDataLocalStorage() {
+  _getDataLocalStorage(){
     const data = JSON.parse(localStorage.getItem('workouts'));
-
+    
     if (!data) return;
 
     this.#workouts = data;
+
     this.#workouts.forEach(work => {
       this._renderWorkout(work);
     });
-  }
-
-  _displayErrorMessage() {
-    errorMessage.style.display = 'block';
-
-    setTimeout(() => {
-      errorMessage.style.display = 'none';
-    }, 3000); // Hide after 3 seconds
-  }
-
-  _closeErrorMessage() {
-    errorMessage.style.display = 'none';
   }
 
   // Deleting workouts list
