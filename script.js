@@ -66,6 +66,7 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 const errorMessage = document.querySelector('.error-message');
 const errorMessageClose = document.querySelector('.close');
+const deleteWorkoutBtn = document.querySelector('.workout__delete-button');
 
 class App {
   // Private properties: are going to be present on all the instances created through this class
@@ -84,6 +85,8 @@ class App {
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleEvelationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+    containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
+
     errorMessageClose.addEventListener(
       'click',
       this._closeErrorMessage.bind(this)
@@ -234,55 +237,81 @@ class App {
 
   // Workouts list
   _renderWorkout(workout) {
+    console.log('carregou botão');
+
     let html = `
-      <li class="workout workout--${workout.type}" data-id="${workout.id}">
+        <li class="workout workout--${workout.type}" data-id="${workout.id}">
+        <a class="workout__edit-button" role="button" aria-label="edit workout"><span aria-hidden="true">edit</span></a>
+        <a class="workout__delete-button" role="button" aria-label="delete workout"><span aria-hidden="true">delete</span></a>
         <h2 class="workout__title">${workout.description}</h2>
-        <div class="workout__details">
-          <span class="workout__icon">${
-            workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
-          }</span>
-          <span class="workout__value">${workout.distance}</span>
-          <span class="workout__unit">km</span>
-        </div>
-        <div class="workout__details">
-          <span class="workout__icon">⏱</span>
-          <span class="workout__value">${workout.duration}</span> 
-          <span class="workout__unit">min</span>
-        </div>
-    `;
+          <div class="workout__details">
+            <span class="workout__icon">${
+              workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
+            }</span>
+            <span class="workout__value">${workout.distance}</span>
+            <span class="workout__unit">km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">⏱</span>
+            <span class="workout__value">${workout.duration}</span> 
+            <span class="workout__unit">min</span>
+          </div>
+      `;
 
     if (workout.type === 'running')
       html += `
-        <div class="workout__details">
-          <span class="workout__icon">⚡️</span>
-          <span class="workout__value">${workout.pace.toFixed(1)}</span>
-          <span class="workout__unit">min/km</span>
-        </div>
-        <div class="workout__details">
-          <span class="workout__icon">🦶🏼</span>
-          <span class="workout__value">${workout.cadance}</span>
-          <span class="workout__unit">spm</span>
-        </div>
-      </li>    
-    `;
+          <div class="workout__details">
+            <span class="workout__icon">⚡️</span>
+            <span class="workout__value">${workout.pace.toFixed(1)}</span>
+            <span class="workout__unit">min/km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">🦶🏼</span>
+            <span class="workout__value">${workout.cadance}</span>
+            <span class="workout__unit">spm</span>
+          </div>
+        </li>    
+      `;
 
     if (workout.type === 'cycling')
       html += `
+            <div class="workout__details">
+            <span class="workout__icon">⚡️</span>
+            <span class="workout__value">${workout.speed.toFixed(1)}</span>
+            <span class="workout__unit">km/h</span>
+          </div>
           <div class="workout__details">
-          <span class="workout__icon">⚡️</span>
-          <span class="workout__value">${workout.speed.toFixed(1)}</span>
-          <span class="workout__unit">km/h</span>
-        </div>
-        <div class="workout__details">
-          <span class="workout__icon">⛰</span>
-          <span class="workout__value">${workout.elevationGain}</span>
-          <span class="workout__unit">m</span>
-        </div>
-      </li>    
-    `;
+            <span class="workout__icon">⛰</span>
+            <span class="workout__value">${workout.elevationGain}</span>
+            <span class="workout__unit">m</span>
+          </div>
+        </li>    
+      `;
 
     form.insertAdjacentHTML('afterend', html);
     errorMessage.style.display = 'none';
+  }
+
+  // Delete workout
+  _deleteWorkout(e) {
+    const workoutElement = e.target.closest('.workout');
+    if (!workoutElement) return;
+
+    const workoutId = workoutElement.dataset.id;
+    const workoutIndex = this.#workouts.findIndex(
+      workout => workout.id === workoutId
+    );
+
+    if (workoutIndex !== -1) {
+      // Remove the workout from the array
+      const deletedWorkout = this.#workouts.splice(workoutIndex, 1)[0];
+
+      // Remove the workout element from the UI
+      workoutElement.remove();
+
+      // Update local storage
+      this._setLocalStorage();
+    }
   }
 
   // Move map to the workout marker when clicked
@@ -290,17 +319,17 @@ class App {
     const workoutElement = e.target.closest('.workout');
     if (!workoutElement) return;
 
-    const workout = this.#workouts.find(
-      work => work.id === workoutElement.dataset.id
-    );
+    const workoutId = workoutElement.dataset.id;
+    const workout = this.#workouts.find(work => work.id === workoutId);
 
-    // Leaflet's method to handle zoom
-    this.#map.setView(workout.coords, this.#mapZoomLevel, {
-      animate: true,
-      pan: {
-        duration: 1,
-      },
-    });
+    if (workout) {
+      this.#map.setView(workout.coords, this.#mapZoomLevel, {
+        animate: true,
+        pan: {
+          duration: 1,
+        },
+      });
+    }
   }
 
   // Saving datas on local storage
