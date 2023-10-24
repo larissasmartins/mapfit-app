@@ -66,7 +66,6 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 const errorMessage = document.querySelector('.error-message');
 const errorMessageClose = document.querySelector('.close');
-const deleteWorkoutBtn = document.querySelector('.workout__delete-button');
 
 class App {
   // Private properties: are going to be present on all the instances created through this class
@@ -241,8 +240,7 @@ class App {
 
     let html = `
         <li class="workout workout--${workout.type}" data-id="${workout.id}">
-        <a class="workout__edit-button" role="button" aria-label="edit workout"><span aria-hidden="true">edit</span></a>
-        <a class="workout__delete-button" role="button" aria-label="delete workout"><span aria-hidden="true">delete</span></a>
+        <a class="workout__delete-button" role="button" aria-label="delete workout">delete</a>
         <h2 class="workout__title">${workout.description}</h2>
           <div class="workout__details">
             <span class="workout__icon">${
@@ -292,24 +290,32 @@ class App {
     errorMessage.style.display = 'none';
   }
 
-  // Delete workout
+  // Handle delete workout
   _deleteWorkout(e) {
-    const workoutElement = e.target.closest('.workout');
-    if (!workoutElement) return;
+    const deleteButton = e.target.closest('.workout__delete-button');
 
-    const workoutId = workoutElement.dataset.id;
+    if (deleteButton) {
+      const workoutElement = deleteButton.closest('.workout');
+
+      if (workoutElement) {
+        const workoutId = workoutElement.dataset.id;
+        this._removeWorkoutUI(workoutElement);
+        this._removeWorkoutStorage(workoutId);
+      }
+    }
+  }
+
+  _removeWorkoutUI(workoutElement) {
+    workoutElement.remove();
+  }
+
+  _removeWorkoutStorage(workoutId) {
     const workoutIndex = this.#workouts.findIndex(
       workout => workout.id === workoutId
     );
 
     if (workoutIndex !== -1) {
-      // Remove the workout from the array
-      const deletedWorkout = this.#workouts.splice(workoutIndex, 1)[0];
-
-      // Remove the workout element from the UI
-      workoutElement.remove();
-
-      // Update local storage
+      this.#workouts.splice(workoutIndex, 1);
       this._setLocalStorage();
     }
   }
