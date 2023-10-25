@@ -297,7 +297,6 @@ class App {
 
     if (deleteButton) {
       const workoutElement = deleteButton.closest('.workout');
-
       if (workoutElement) {
         const workoutId = workoutElement.dataset.id;
         this._removeWorkoutUI(workoutElement);
@@ -338,7 +337,8 @@ class App {
     const workout = this.#workouts.find(work => work.id === workoutId);
 
     if (workout) {
-      this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      const [lat, lng] = workout.coords;
+      this.#map.setView([lat, lng], this.#mapZoomLevel, {
         animate: true,
         pan: {
           duration: 1,
@@ -369,41 +369,26 @@ class App {
 
     if (!data) return;
 
-    this.#workouts = data.map(workoutData => {
-      if (workoutData.type === 'running') {
-        const workout = new Running(
-          workoutData.coords,
-          workoutData.distance,
-          workoutData.duration,
-          workoutData.cadence
+    this.#workouts = data.map(workout => {
+      if (workout.type === 'running') {
+        return new Running(
+          workout.coords,
+          workout.distance,
+          workout.duration,
+          workout.cadance
         );
-        if (!isNaN(workoutData.pace)) {
-          workout.pace = parseFloat(workoutData.pace);
-        } else {
-          workout.calcPace(); // Calculate the pace if not stored
-        }
-        return workout;
-      } else if (workoutData.type === 'cycling') {
-        const workout = new Cycling(
-          workoutData.coords,
-          workoutData.distance,
-          workoutData.duration,
-          workoutData.elevationGain
+      } else if (workout.type === 'cycling') {
+        return new Cycling(
+          workout.coords,
+          workout.distance,
+          workout.duration,
+          workout.elevationGain
         );
-        if (!isNaN(workoutData.speed)) {
-          workout.speed = parseFloat(workoutData.speed);
-        } else {
-          workout.calcSpeed(); // Calculate the speed if not stored
-        }
-        return workout;
       }
-      return null; // Handle other workout types or missing data
     });
 
-    this.#workouts.forEach(workout => {
-      if (workout) {
-        this._renderWorkout(workout);
-      }
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
     });
   }
 
@@ -422,7 +407,7 @@ class App {
   // Deleting workouts list
   reset() {
     localStorage.removeItem('workouts');
-    location.realod();
+    location.reload();
   }
 }
 
