@@ -358,7 +358,7 @@ class App {
       cadance: workout.cadance,
       pace: workout.pace,
       speed: workout.speed,
-      elevationGain: workout.elevationGain
+      elevationGain: workout.elevationGain,
     }));
 
     localStorage.setItem('workouts', JSON.stringify(workoutsToSave));
@@ -369,9 +369,41 @@ class App {
 
     if (!data) return;
 
-    this.#workouts = data;
-    this.#workouts.forEach(work => {
-      this._renderWorkout(work);
+    this.#workouts = data.map(workoutData => {
+      if (workoutData.type === 'running') {
+        const workout = new Running(
+          workoutData.coords,
+          workoutData.distance,
+          workoutData.duration,
+          workoutData.cadence
+        );
+        if (!isNaN(workoutData.pace)) {
+          workout.pace = parseFloat(workoutData.pace);
+        } else {
+          workout.calcPace(); // Calculate the pace if not stored
+        }
+        return workout;
+      } else if (workoutData.type === 'cycling') {
+        const workout = new Cycling(
+          workoutData.coords,
+          workoutData.distance,
+          workoutData.duration,
+          workoutData.elevationGain
+        );
+        if (!isNaN(workoutData.speed)) {
+          workout.speed = parseFloat(workoutData.speed);
+        } else {
+          workout.calcSpeed(); // Calculate the speed if not stored
+        }
+        return workout;
+      }
+      return null; // Handle other workout types or missing data
+    });
+
+    this.#workouts.forEach(workout => {
+      if (workout) {
+        this._renderWorkout(workout);
+      }
     });
   }
 
