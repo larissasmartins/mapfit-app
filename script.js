@@ -217,7 +217,7 @@ class App {
     });
 
     // Display marker
-    L.marker(workout.coords, { icon: newIcon })
+    const marker = L.marker(workout.coords, { icon: newIcon })
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -232,6 +232,9 @@ class App {
         `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
       )
       .openPopup();
+
+    // Store the marker in the workout object  
+    workout.marker = marker;
   }
 
   // Workouts list
@@ -300,6 +303,7 @@ class App {
       if (workoutElement) {
         const workoutId = workoutElement.dataset.id;
         this._removeWorkoutUI(workoutElement);
+        this._removeWorkoutMarker(workoutId);
         this._removeWorkoutStorage(workoutId);
       }
     }
@@ -307,6 +311,13 @@ class App {
 
   _removeWorkoutUI(workoutElement) {
     workoutElement.remove();
+  }
+
+  _removeWorkoutMarker(workoutId) {
+    const workout = this.#workouts.find(work => work.id === workoutId);
+    if (workout && workout.marker) {
+      workout.marker.remove();
+    }
   }
 
   _removeWorkoutStorage(workoutId) {
@@ -338,7 +349,7 @@ class App {
     }
   }
 
-  // Saving datas on local storage
+  // Saving datas on local storage 
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
