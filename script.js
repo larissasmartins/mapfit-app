@@ -233,14 +233,12 @@ class App {
       )
       .openPopup();
 
-    // Store the marker in the workout object  
+    // Store the marker in the workout object
     workout.marker = marker;
   }
 
   // Workouts list
   _renderWorkout(workout) {
-    console.log('carregou botão');
-
     let html = `
         <li class="workout workout--${workout.type}" data-id="${workout.id}">
         <a class="workout__delete-button" role="button" aria-label="delete workout">delete</a>
@@ -349,9 +347,21 @@ class App {
     }
   }
 
-  // Saving datas on local storage 
+  // Saving datas on local storage - array of workout objects containing only the necessary data
   _setLocalStorage() {
-    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+    const workoutsToSave = this.#workouts.map(workout => ({
+      id: workout.id,
+      type: workout.type,
+      coords: workout.coords,
+      distance: workout.distance,
+      duration: workout.duration,
+      cadance: workout.cadance,
+      pace: workout.pace,
+      speed: workout.speed,
+      elevationGain: workout.elevationGain
+    }));
+
+    localStorage.setItem('workouts', JSON.stringify(workoutsToSave));
   }
 
   _getDataLocalStorage() {
