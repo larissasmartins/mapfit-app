@@ -297,7 +297,6 @@ class App {
 
     if (deleteButton) {
       const workoutElement = deleteButton.closest('.workout');
-
       if (workoutElement) {
         const workoutId = workoutElement.dataset.id;
         this._removeWorkoutUI(workoutElement);
@@ -338,7 +337,8 @@ class App {
     const workout = this.#workouts.find(work => work.id === workoutId);
 
     if (workout) {
-      this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      const [lat, lng] = workout.coords;
+      this.#map.setView([lat, lng], this.#mapZoomLevel, {
         animate: true,
         pan: {
           duration: 1,
@@ -358,7 +358,7 @@ class App {
       cadance: workout.cadance,
       pace: workout.pace,
       speed: workout.speed,
-      elevationGain: workout.elevationGain
+      elevationGain: workout.elevationGain,
     }));
 
     localStorage.setItem('workouts', JSON.stringify(workoutsToSave));
@@ -369,7 +369,24 @@ class App {
 
     if (!data) return;
 
-    this.#workouts = data;
+    this.#workouts = data.map(workout => {
+      if (workout.type === 'running') {
+        return new Running(
+          workout.coords,
+          workout.distance,
+          workout.duration,
+          workout.cadance
+        );
+      } else if (workout.type === 'cycling') {
+        return new Cycling(
+          workout.coords,
+          workout.distance,
+          workout.duration,
+          workout.elevationGain
+        );
+      }
+    });
+
     this.#workouts.forEach(work => {
       this._renderWorkout(work);
     });
@@ -390,7 +407,7 @@ class App {
   // Deleting workouts list
   reset() {
     localStorage.removeItem('workouts');
-    location.realod();
+    location.reload();
   }
 }
 
