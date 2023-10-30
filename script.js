@@ -2,9 +2,15 @@
 
 class Workout {
   date = new Date();
-  id = (Date.now() + '').slice(-10);
+
+  static generateWorkoutID() { // Function to generate unique IDs
+    return (Date.now() + Math.floor(Math.random() * 1e10))
+      .toString()
+      .slice(0, 10);
+  }
 
   constructor(coords, distance, duration) {
+    this.id = Workout.generateWorkoutID();
     this.coords = coords; // [lag, lng]
     this.distance = distance; // in km
     this.duration = duration; // in min
@@ -334,7 +340,13 @@ class App {
     if (!workoutElement) return;
 
     const workoutId = workoutElement.dataset.id;
+    console.log('Clicked workout ID:', workoutId);
+
+    // Debugging: Log all workouts to see if you're getting the correct data
+    console.log('All workouts:', this.#workouts);
+
     const workout = this.#workouts.find(work => work.id === workoutId);
+    console.log('Found workout:', workout);
 
     if (workout) {
       const [lat, lng] = workout.coords;
