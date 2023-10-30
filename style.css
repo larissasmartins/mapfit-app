@@ -1,6 +1,7 @@
 :root {
   --color-brand--1: #f4d1ae;
   --color-brand--2: #7D5BA6;
+  --color-brand-3: #1494D5;
 
   --color-dark--1: #72A78D;
   --color-dark--2: #42484d;
@@ -76,10 +77,13 @@ a:visited {
   gap: 0.75rem 1.5rem;
 }
 .workout--running {
-  border-left: 5px solid var(--color-brand--2);
+  border-left: 5px solid var(--color-brand--1);
 }
 .workout--cycling {
-  border-left: 5px solid var(--color-brand--1);
+  border-left: 5px solid var(--color-brand--2);
+}
+.workout--walking {
+  border-left: 5px solid var(--color-brand-3);
 }
 
 .workout__title {
@@ -233,10 +237,13 @@ a:visited {
 }
 
 .running-popup .leaflet-popup-content-wrapper {
-  border-left: 5px solid var(--color-brand--2);
+  border-left: 5px solid var(--color-brand--1);
 }
 .cycling-popup .leaflet-popup-content-wrapper {
-  border-left: 5px solid var(--color-brand--1);
+  border-left: 5px solid var(--color-brand--2);
+}
+.walking-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-brand-3);
 }
 
 /* Small devices */
