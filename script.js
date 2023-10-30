@@ -3,7 +3,8 @@
 class Workout {
   date = new Date();
 
-  static generateWorkoutID() { // Function to generate unique IDs
+  static generateWorkoutID() {
+    // Function to generate unique IDs
     return (Date.now() + Math.floor(Math.random() * 1e10))
       .toString()
       .slice(0, 10);
@@ -26,6 +27,25 @@ class Workout {
     } ${this.date.getDate()}`;
   }
 }
+
+class Walking extends Workout {
+  type = 'walking';
+
+  constructor(coords, distance, duration, cadence) {
+    super(coords, distance, duration);
+    this.cadence = cadence;
+
+    this.calcPace();
+    this._setDescription();
+  }
+
+  calcPace() {
+    // min/km
+    this.pace = this.duration / this.distance;
+    return this.pace;
+  }
+}
+
 class Running extends Workout {
   type = 'running';
 
@@ -88,7 +108,7 @@ class App {
     this._getDataLocalStorage();
 
     form.addEventListener('submit', this._newWorkout.bind(this));
-    inputType.addEventListener('change', this._toggleEvelationField);
+    // inputType.addEventListener('change', this._toggleEvelationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
     containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
 
@@ -136,6 +156,26 @@ class App {
     this.#mapEvent = mapE;
     form.classList.remove('hidden');
     inputDistance.focus();
+
+    // Add an event listener to the inputType element to handle input switching
+    inputType.addEventListener('change', () => {
+      const selectedWorkoutType = inputType.value;
+
+      // Show the elevation input field for cycling workouts and switch to cadence for running and walking
+      const elevationInputRow = inputElevation.closest('.form__row');
+      const cadenceInputRow = inputCadence.closest('.form__row');
+
+      if (selectedWorkoutType === 'cycling') {
+        elevationInputRow.classList.remove('form__row--hidden');
+        cadenceInputRow.classList.add('form__row--hidden');
+      } else if (
+        selectedWorkoutType === 'running' ||
+        selectedWorkoutType === 'walking'
+      ) {
+        elevationInputRow.classList.add('form__row--hidden');
+        cadenceInputRow.classList.remove('form__row--hidden');
+      }
+    });
   }
 
   _hideForm() {
@@ -165,6 +205,21 @@ class App {
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
+
+    // If walking, create running object
+    if (type === 'walking') {
+      const cadence = +inputCadence.value;
+      // Check if the data is valid
+      if (
+        !validInputs(distance, duration, cadence) ||
+        !allPositive(distance, duration, cadence)
+      ) {
+        // Display error message notification
+        this._displayErrorMessage();
+        return;
+      }
+      workout = new Walking([lat, lng], distance, duration, cadence);
+    }
 
     // If running, create running object
     if (type === 'running') {
@@ -235,7 +290,13 @@ class App {
         })
       )
       .setPopupContent(
-        `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
+        `${
+          workout.type === 'walking'
+            ? '🚶‍♂️'
+            : workout.type === 'running'
+            ? '🏃‍♂️'
+            : '🚴‍♀️'
+        } ${workout.description}`
       )
       .openPopup();
 
@@ -251,7 +312,11 @@ class App {
         <h2 class="workout__title">${workout.description}</h2>
           <div class="workout__details">
             <span class="workout__icon">${
-              workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
+              workout.type === 'walking'
+                ? '🚶‍♂️'
+                : workout.type === 'running'
+                ? '🏃‍♂️'
+                : '🚴‍♀️'
             }</span>
             <span class="workout__value">${workout.distance}</span>
             <span class="workout__unit">km</span>
@@ -261,6 +326,21 @@ class App {
             <span class="workout__value">${workout.duration}</span> 
             <span class="workout__unit">min</span>
           </div>
+      `;
+
+    if (workout.type === 'walking')
+      html += `
+          <div class="workout__details">
+            <span class="workout__icon">⚡️</span>
+            <span class="workout__value">${workout.pace.toFixed(1)}</span>
+            <span class="workout__unit">min/km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">🦶🏼</span>
+            <span class="workout__value">${workout.cadence}</span>
+            <span class="workout__unit">spm</span>
+          </div>
+        </li>    
       `;
 
     if (workout.type === 'running')
@@ -382,7 +462,14 @@ class App {
 
     this.#workouts = data.map(workoutData => {
       // Create Running or Cycling instances based on the 'type' property.
-      if (workoutData.type === 'running') {
+      if (workoutData.type === 'walking') {
+        return new Walking(
+          workoutData.coords,
+          workoutData.distance,
+          workoutData.duration,
+          workoutData.cadence
+        );
+      } else if (workoutData.type === 'running') {
         return new Running(
           workoutData.coords,
           workoutData.distance,
