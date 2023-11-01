@@ -73,9 +73,15 @@ a:visited {
   cursor: pointer;
 
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  grid-template-areas: "title title title title delete";
   gap: 0.75rem 1.5rem;
 }
+
+.workout:hover {
+  opacity: .9;
+}
+
 .workout--running {
   border-left: 5px solid var(--color-brand--1);
 }
@@ -90,6 +96,18 @@ a:visited {
   font-size: 1.7rem;
   font-weight: 600;
   grid-column: 1 / -1;
+}
+
+.workout__delete-button {
+  grid-area: delete;
+  margin-bottom: -15px;
+  padding: 5px 7px;
+  border-radius: 5px;
+  transition: .2s ease-in-out;
+}
+
+.workout__delete-button:hover {
+  background: var(--color-dark--1);
 }
 
 .workout__details {
@@ -262,6 +280,6 @@ a:visited {
     font-size: 1.35rem;
   }
   .workout {
-    gap: .5rem;
+    gap: .2rem;
   }
 }
