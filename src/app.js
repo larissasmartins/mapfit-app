@@ -1,86 +1,5 @@
 'use strict';
-
-class Workout {
-  date = new Date();
-
-  static generateWorkoutID() {
-    // Function to generate unique IDs
-    return (Date.now() + Math.floor(Math.random() * 1e10))
-      .toString()
-      .slice(0, 10);
-  }
-
-  constructor(coords, distance, duration) {
-    this.id = Workout.generateWorkoutID();
-    this.coords = coords; // [lag, lng]
-    this.distance = distance; // in km
-    this.duration = duration; // in min
-  }
-
-  // Adding a description on the workout marker
-  _setDescription() {
-    // prettier-ignore
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
-      months[this.date.getMonth()]
-    } ${this.date.getDate()}`;
-  }
-}
-
-class Walking extends Workout {
-  type = 'walking';
-
-  constructor(coords, distance, duration, cadence) {
-    super(coords, distance, duration);
-    this.cadence = cadence;
-
-    this.calcPace();
-    this._setDescription();
-  }
-
-  calcPace() {
-    // min/km
-    this.pace = this.duration / this.distance;
-    return this.pace;
-  }
-}
-
-class Running extends Workout {
-  type = 'running';
-
-  constructor(coords, distance, duration, cadence) {
-    super(coords, distance, duration);
-    this.cadence = cadence;
-
-    this.calcPace();
-    this._setDescription();
-  }
-
-  calcPace() {
-    // min/km
-    this.pace = this.duration / this.distance;
-    return this.pace;
-  }
-}
-
-class Cycling extends Workout {
-  type = 'cycling';
-
-  constructor(coords, distance, duration, elevationGain) {
-    super(coords, distance, duration);
-    this.elevationGain = elevationGain;
-
-    this.calcSpeed();
-    this._setDescription();
-  }
-
-  calcSpeed() {
-    // km/h
-    this.speed = this.distance / (this.duration / 60);
-    return this.speed;
-  }
-}
+import { Workout, Walking, Running, Cycling } from './workouts.js';
 
 ////////////////////////////////// Application Architecture
 const form = document.querySelector('.form');
@@ -93,7 +12,7 @@ const inputElevation = document.querySelector('.form__input--elevation');
 const errorMessage = document.querySelector('.error-message');
 const errorMessageClose = document.querySelector('.close');
 
-class App {
+export class App {
   // Private properties: are going to be present on all the instances created through this class
   #map;
   #mapEvent;
@@ -108,7 +27,6 @@ class App {
     this._getDataLocalStorage();
 
     form.addEventListener('submit', this._newWorkout.bind(this));
-    // inputType.addEventListener('change', this._toggleEvelationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
     containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
 
@@ -190,7 +108,7 @@ class App {
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   }
 
-  // When filling the form...
+  // When filling the form with invalid data, display error message
   _newWorkout(e) {
     // Inputs validation
     const validInputs = (...inputs) =>
@@ -420,13 +338,7 @@ class App {
     if (!workoutElement) return;
 
     const workoutId = workoutElement.dataset.id;
-    console.log('Clicked workout ID:', workoutId);
-
-    // Debugging: Log all workouts to see if you're getting the correct data
-    console.log('All workouts:', this.#workouts);
-
     const workout = this.#workouts.find(work => work.id === workoutId);
-    console.log('Found workout:', workout);
 
     if (workout) {
       const [lat, lng] = workout.coords;
@@ -457,7 +369,6 @@ class App {
 
   _getDataLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
-
     if (!data) return;
 
     this.#workouts = data.map(workoutData => {
@@ -502,12 +413,4 @@ class App {
   _closeErrorMessage() {
     errorMessage.style.display = 'none';
   }
-
-  // Deleting workouts list
-  reset() {
-    localStorage.removeItem('workouts');
-    location.reload();
-  }
 }
-
-const app = new App();
