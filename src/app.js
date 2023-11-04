@@ -108,13 +108,7 @@ export class App {
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   }
 
-  // When filling the form with invalid data, display error message
   _newWorkout(e) {
-    // Inputs validation
-    const validInputs = (...inputs) =>
-      inputs.every(input => Number.isFinite(input));
-    const allPositive = (...inputs) => inputs.every(input => input > 0);
-
     e.preventDefault();
 
     // Get data from the form
@@ -122,60 +116,37 @@ export class App {
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
+
+    // Check if the data is valid
+    if (
+      !this._validateInputs(type, distance, duration) ||
+      !this._validatePositivity(type, distance, duration)
+    ) {
+      // Display error message notification
+      this._displayErrorMessage();
+      return;
+    }
+
     let workout;
 
-    // If walking, create running object
-    if (type === 'walking') {
+    if (type === 'walking' || type === 'running') {
       const cadence = +inputCadence.value;
-      // Check if the data is valid
-      if (
-        !validInputs(distance, duration, cadence) ||
-        !allPositive(distance, duration, cadence)
-      ) {
-        // Display error message notification
-        this._displayErrorMessage();
-        return;
-      }
-      workout = new Walking([lat, lng], distance, duration, cadence);
-    }
-
-    // If running, create running object
-    if (type === 'running') {
-      const cadence = +inputCadence.value;
-      // Check if the data is valid
-      if (
-        !validInputs(distance, duration, cadence) ||
-        !allPositive(distance, duration, cadence)
-      ) {
-        // Display error message notification
-        this._displayErrorMessage();
-        return;
-      }
-      workout = new Running([lat, lng], distance, duration, cadence);
-    }
-
-    // If cycling, create cycling object
-    if (type === 'cycling') {
-      // Check if the data is valid
+      workout =
+        type === 'walking'
+          ? new Walking([lat, lng], distance, duration, cadence)
+          : new Running([lat, lng], distance, duration, cadence);
+    } else if (type === 'cycling') {
       const elevation = +inputElevation.value;
-      if (
-        !validInputs(distance, duration, elevation) ||
-        !allPositive(distance, duration)
-      ) {
-        // Display error message notification
-        this._displayErrorMessage();
-        return;
-      }
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
 
     // Add new object to workout array
     this.#workouts.push(workout);
 
-    // Render workout on map as marker
+    // Render workout on map as a marker
     this._renderWorkoutMarker(workout);
 
-    // Render workout on list
+    // Render workout on the list
     this._renderWorkout(workout);
 
     // Hide form and clear input fields
@@ -183,6 +154,20 @@ export class App {
 
     // Set local storage to all workouts
     this._setLocalStorage();
+  }
+
+  _validateInputs(type, distance, duration) {
+    return Number.isFinite(distance) && Number.isFinite(duration);
+  }
+
+  _validatePositivity(type, distance, duration) {
+    if (type === 'walking' || type === 'running') {
+      const cadence = +inputCadence.value;
+      return distance > 0 && duration > 0 && cadence > 0;
+    } else if (type === 'cycling') {
+      const elevation = +inputElevation.value;
+      return distance > 0 && duration > 0 && elevation > 0;
+    }
   }
 
   _renderWorkoutMarker(workout) {
