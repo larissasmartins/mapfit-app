@@ -22,5 +22,4 @@
   <a href="https://mapfit-app.vercel.app">Click here to check it out!</a>
 </h3></br>
 
-<div align="center"> ![mapfit1](https://github.com/larissasmartins/mapfit-app/assets/96597131/be41320c-4018-40ec-a6c7-ad50eb31044a) </div>
-<div align="center"> ![mapfit2](https://github.com/larissasmartins/mapfit-app/assets/96597131/a1730877-2ada-4349-8760-8dd143e11ca3) </div>
+<img width="1438" alt="Captura de pantalla 2023-11-07 a las 9 05 01" src="https://github.com/larissasmartins/mapfit-app/assets/96597131/6498caf2-a6e1-4a4b-9e02-4140dfe960d1">
