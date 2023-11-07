@@ -16,11 +16,11 @@
 7. Object-Oriented: it employs the power of object-oriented programming in JavaScript, making the codebase modular and easy to extend.</p>
 
 ## Layout
-<h3 align="center">Status: In progress... :hourglass_flowing_sand:</h3>
+<h3 align="center">Status: Done! :white_check_mark:</h3>
 
 <h3 align="center">
   <a href="https://mapfit-app.vercel.app">Click here to check it out!</a>
 </h3></br>
 
-![mapfit1](https://github.com/larissasmartins/mapfit-app/assets/96597131/be41320c-4018-40ec-a6c7-ad50eb31044a)
-![mapfit2](https://github.com/larissasmartins/mapfit-app/assets/96597131/a1730877-2ada-4349-8760-8dd143e11ca3)
+<div align="center"> ![mapfit1](https://github.com/larissasmartins/mapfit-app/assets/96597131/be41320c-4018-40ec-a6c7-ad50eb31044a) </div>
+<div align="center"> ![mapfit2](https://github.com/larissasmartins/mapfit-app/assets/96597131/a1730877-2ada-4349-8760-8dd143e11ca3) </div>
